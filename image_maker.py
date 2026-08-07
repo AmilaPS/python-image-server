@@ -839,19 +839,41 @@ async def generate_card_pdf(request: Request):
                         img_element.set('{http://www.w3.org/1999/xlink}href', '')
                         img_element.set('href', '')
             
+            # 🎯 SVG එක තුළට @font-face CSS Rules Inject කිරීම (CairoSVG Font Fix)
+            defs_element = root.find('{http://www.w3.org/2000/svg}defs')
+            if defs_element is None:
+                defs_element = ET.Element('{http://www.w3.org/2000/svg}defs')
+                root.insert(0, defs_element)
+
+            style_element = defs_element.find('{http://www.w3.org/2000/svg}style')
+            if style_element is None:
+                style_element = ET.SubElement(defs_element, '{http://www.w3.org/2000/svg}style')
+                style_element.text = ""
+
             cursor_font = get_db().cursor()
+            font_cache = set()
+
             for text_element in root.findall('.//{http://www.w3.org/2000/svg}text'):
                 text_slot_id = text_element.get('id')
                 svg_font = text_element.get("font-family", "").replace("'", "").replace('"', "")
                 
-                cursor_font.execute("SELECT file_path FROM fonts WHERE font_name = ?", (svg_font,))
-                font_res = cursor_font.fetchone()
+                if svg_font and svg_font not in font_cache:
+                    cursor_font.execute("SELECT file_path FROM fonts WHERE font_name = ?", (svg_font,))
+                    font_res = cursor_font.fetchone()
+                    
+                    if font_res:
+                        full_font_path = os.path.join(BASE_DIR, font_res[0]).replace("\\", "/")
+                        font_url = f"file:///{full_font_path}"
+                        # Valid @font-face Rule එක Inject කිරීම
+                        font_face_rule = f"\n@font-face {{ font-family: '{svg_font}'; src: url('{font_url}'); }}\n"
+                        style_element.text += font_face_rule
+                        font_cache.add(svg_font)
                 
-                if font_res:
-                    full_font_path = os.path.join(BASE_DIR, font_res[0]).replace("\\", "/")
-                    font_url = f"file:///{full_font_path}"
-                    text_element.set("style", f"font-family: '{svg_font}'; src: url('{font_url}');")
-                
+                # Text Element එකට font-family විතරක් set කිරීම
+                if svg_font:
+                    text_element.set("font-family", svg_font)
+                    text_element.set("style", f"font-family: '{svg_font}';")
+
                 if text_slot_id:
                     matched_text_key = None
                     for form_key in form_data.keys():
