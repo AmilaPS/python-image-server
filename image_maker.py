@@ -839,7 +839,7 @@ async def generate_card_pdf(request: Request):
                         img_element.set('{http://www.w3.org/1999/xlink}href', '')
                         img_element.set('href', '')
             
-            # 🎯 SVG එක තුළට @font-face CSS Rules Inject කිරීම (CairoSVG Font Fix)
+# 🎯 CAIROSVG FORCED FONT INJECTION ENGINE (Paradise Silhouette Fix)
             defs_element = root.find('{http://www.w3.org/2000/svg}defs')
             if defs_element is None:
                 defs_element = ET.Element('{http://www.w3.org/2000/svg}defs')
@@ -855,24 +855,36 @@ async def generate_card_pdf(request: Request):
 
             for text_element in root.findall('.//{http://www.w3.org/2000/svg}text'):
                 text_slot_id = text_element.get('id')
-                svg_font = text_element.get("font-family", "").replace("'", "").replace('"', "")
+                
+                # Single quotes / Double quotes ඔක්කොම Clean කර Font Name එක ගැනීම
+                raw_font = text_element.get("font-family", "")
+                svg_font = raw_font.replace("'", "").replace('"', "").strip()
                 
                 if svg_font and svg_font not in font_cache:
-                    cursor_font.execute("SELECT file_path FROM fonts WHERE font_name = ?", (svg_font,))
+                    # Database එකෙන් Case-Insensitive search එකක් කිරීම
+                    cursor_font.execute("SELECT file_path FROM fonts WHERE LOWER(TRIM(font_name)) = LOWER(?)", (svg_font,))
                     font_res = cursor_font.fetchone()
                     
                     if font_res:
-                        full_font_path = os.path.join(BASE_DIR, font_res[0]).replace("\\", "/")
+                        full_font_path = os.path.abspath(os.path.join(BASE_DIR, font_res[0])).replace("\\", "/")
                         font_url = f"file:///{full_font_path}"
-                        # Valid @font-face Rule එක Inject කිරීම
-                        font_face_rule = f"\n@font-face {{ font-family: '{svg_font}'; src: url('{font_url}'); }}\n"
+                        
+                        # Valid SVG @font-face rule එක Inject කිරීම
+                        font_face_rule = f"""
+                        @font-face {{
+                            font-family: '{svg_font}';
+                            src: url('{font_url}');
+                        }}
+                        """
                         style_element.text += font_face_rule
                         font_cache.add(svg_font)
-                
-                # Text Element එකට font-family විතරක් set කිරීම
+                        print(f"✅ [PDF Font Loaded]: {svg_font} -> {font_url}")
+                    else:
+                        print(f"❌ [PDF Font Missing in DB]: '{svg_font}' - Please add this exact name in Fonts Manager!")
+
+                # Font Name එක Clean කර Element එකට යළි Set කිරීම
                 if svg_font:
                     text_element.set("font-family", svg_font)
-                    text_element.set("style", f"font-family: '{svg_font}';")
 
                 if text_slot_id:
                     matched_text_key = None
