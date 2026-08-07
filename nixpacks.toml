@@ -1,2 +1,13 @@
+[phases.setup]
+aptPkgs = [
+    "libcairo2",
+    "libcairo2-dev",
+    "pango1.0-tools",
+    "libpango1.0-dev",
+    "libgdk-pixbuf2.0-0",
+    "libffi-dev",
+    "shared-mime-info"
+]
+
 [providers]
 python = "3.11"
