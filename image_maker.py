@@ -838,53 +838,20 @@ async def generate_card_pdf(request: Request):
                         # 💡 Image එකක් තෝරාගෙන නැති නම්, SVG tag එකේ href/xlink:href හිස් කර දමන්න
                         img_element.set('{http://www.w3.org/1999/xlink}href', '')
                         img_element.set('href', '')
-            
-# 🎯 CAIROSVG BASE64 FONT EMBEDDING ENGINE (Railway Linux Fix)
-            defs_element = root.find('{http://www.w3.org/2000/svg}defs')
-            if defs_element is None:
-                defs_element = ET.Element('{http://www.w3.org/2000/svg}defs')
-                root.insert(0, defs_element)
-
-            style_element = defs_element.find('{http://www.w3.org/2000/svg}style')
-            if style_element is None:
-                style_element = ET.SubElement(defs_element, '{http://www.w3.org/2000/svg}style')
-                style_element.text = ""
 
             cursor_font = get_db().cursor()
-            font_cache = set()
 
             for text_element in root.findall('.//{http://www.w3.org/2000/svg}text'):
                 text_slot_id = text_element.get('id')
                 
+                # Font Name එකේ තියෙන Quotes ('' හෝ "") සියල්ල ඉවත් කර Clean නම ගැනීම
                 raw_font = text_element.get("font-family", "")
                 svg_font = raw_font.replace("'", "").replace('"', "").strip()
                 
-                if svg_font and svg_font not in font_cache:
-                    cursor_font.execute("SELECT file_path FROM fonts WHERE LOWER(TRIM(font_name)) = LOWER(?)", (svg_font,))
-                    font_res = cursor_font.fetchone()
-                    
-                    if font_res:
-                        full_font_path = os.path.abspath(os.path.join(BASE_DIR, font_res[0]))
-                        
-                        if os.path.exists(full_font_path):
-                            # Font File එක Base64 බවට හරවා SVG එක ඇතුළටම Embed කිරීම
-                            with open(full_font_path, "rb") as f_file:
-                                font_b64 = base64.b64encode(f_file.read()).decode("utf-8")
-                            
-                            font_face_rule = f"""
-                            @font-face {{
-                                font-family: '{svg_font}';
-                                src: url('data:font/ttf;charset=utf-8;base64,{font_b64}') format('truetype');
-                            }}
-                            """
-                            style_element.text += font_face_rule
-                            font_cache.add(svg_font)
-                            print(f"✅ [PDF Font Base64 Embedded]: {svg_font}")
-                    else:
-                        print(f"❌ [PDF Font Missing in DB]: '{svg_font}'")
-
                 if svg_font:
+                    # SVG Element එකට Quotes නැතිව Clean Font Name එක Set කිරීම
                     text_element.set("font-family", svg_font)
+                    text_element.attrib.pop("style", None) # Incorrect style attributes ඉවත් කිරීම
 
                 if text_slot_id:
                     matched_text_key = None
