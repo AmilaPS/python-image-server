@@ -1,2 +1,8 @@
+[phases.setup]
+nixPkgs = ["cairo", "pango", "gdk-pixbuf", "fontconfig", "freetype"]
+
+[phases.install]
+cmds = ["python -m venv /app/.venv", "/app/.venv/bin/pip install -r requirements.txt"]
+
 [providers]
 python = "3.11"
