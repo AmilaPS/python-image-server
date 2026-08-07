@@ -1,2 +1,2 @@
-[pkgs]
-cmds = ["cairo", "pango", "gdk-pixbuf"]
+[phases.setup]
+nixPkgs = ["cairo", "pango", "gdk-pixbuf", "fontconfig", "freetype"]
