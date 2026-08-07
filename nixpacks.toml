@@ -1,2 +1,2 @@
-[phases.setup]
-nixPkgs = ["cairo", "pango", "gdk-pixbuf", "fontconfig", "freetype"]
+[providers]
+python = "3.11"
