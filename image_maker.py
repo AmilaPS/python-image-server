@@ -108,6 +108,31 @@ def init_db():
 
 init_db()
 
+# =================================================================
+# 🎯 LINUX SYSTEM FONT AUTO-REGISTER ENGINE (Railway / CairoSVG Fix)
+# =================================================================
+def sync_fonts_to_linux_system():
+    try:
+        user_fonts_dir = os.path.expanduser("~/.fonts")
+        os.makedirs(user_fonts_dir, exist_ok=True)
+        
+        fonts_src = os.path.join(BASE_DIR, "fonts")
+        if os.path.exists(fonts_src):
+            for f in os.listdir(fonts_src):
+                if f.lower().endswith(('.ttf', '.otf')):
+                    src_path = os.path.join(fonts_src, f)
+                    dst_path = os.path.join(user_fonts_dir, f)
+                    shutil.copy2(src_path, dst_path)
+        
+        # Linux Font Cache එක Force Refresh කිරීම
+        subprocess.run(["fc-cache", "-f"], check=False)
+        print("✅ [Linux System Fonts Registered Successfully]")
+    except Exception as e:
+        print(f"⚠️ System Font Sync Warning: {e}")
+
+# Server Start වෙද්දීම Run කිරීම
+sync_fonts_to_linux_system()
+
 def clean_and_save_file(file_obj, target_dir):
     os.makedirs(target_dir, exist_ok=True)
     for old_f in os.listdir(target_dir):
@@ -569,8 +594,13 @@ def get_fonts():
 def add_font(font_name: str = Form(...), file: UploadFile = File(...)):
     file_path = f"fonts/{file.filename}"
     full_font_path = os.path.join(BASE_DIR, file_path)
+    
     with open(full_font_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
+    
+    # 🎯 අලුත් Font එකක් Upload කළ සැනින් Linux OS එකට Auto-Sync කිරීම
+    sync_fonts_to_linux_system()
+
     conn = get_db()
     cursor = conn.cursor()
     try:
