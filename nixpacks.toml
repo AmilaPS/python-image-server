@@ -1,0 +1,2 @@
+[pkgs]
+cmds = ["cairo", "pango", "gdk-pixbuf"]
