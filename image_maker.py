@@ -372,11 +372,19 @@ async def update_card(
     cursor.execute("DELETE FROM card_assets WHERE card_id = ?", (card_id,))
     
     for asset in assets_list:
-        final_filename = old_assets.get(asset['requirement_name'], "none")
         req_name = asset.get('requirement_name') or asset.get('asset_name')
+        
+        # 🎯 Request name එක වෙනස් කළත් Frontend එකෙන් එවන saved_file_name එක භාවිතා කිරීම:
+        saved_file = asset.get('saved_file_name')
+        if not saved_file or saved_file == "none":
+            saved_file = old_assets.get(req_name, "none")
+            
+        final_filename = saved_file
         
         if not asset['use_image_maker'] and asset['client_filename'] in file_dict:
             f_obj = file_dict[asset['client_filename']]
+            
+            # අලුත් file එකක් upload කර ඇත්නම් පමණක් පරණ file එක මකා දැමීම:
             if final_filename and final_filename != "none":
                 old_asset_path = os.path.join(card_base_dir, final_filename)
                 if os.path.exists(old_asset_path):
