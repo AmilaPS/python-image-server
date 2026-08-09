@@ -8,6 +8,7 @@ import xml.etree.ElementTree as ET
 import cairosvg
 import threading
 import time
+import subprocess
 from fastapi import FastAPI, HTTPException, Form, File, UploadFile, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
