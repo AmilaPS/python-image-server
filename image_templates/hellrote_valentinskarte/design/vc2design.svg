@@ -2155,9 +2155,9 @@
 	</g>
 </g>
 <g>
-	<text transform="matrix(0.9243 0 0 1 189.5942 687.6019)" class="st8 st9">Personello GmbH . Zum Lokschuppen 1 ; D - 66424 Homburg . </text>
-	<text transform="matrix(0.9243 0 0 1 435.3545 687.6019)" class="st10 st8 st9">service@personello.com</text>
-	<text transform="matrix(0.9243 0 0 1 528.7949 687.6019)" class="st8 st9"> . PID545234</text>
+	<text transform="matrix(0.9243 0 0 1 189.5942 687.6019)" font-family="Nunito" font-size="9.3874px">Personello GmbH . Zum Lokschuppen 1 ; D - 66424 Homburg . </text>
+	<text transform="matrix(0.9243 0 0 1 435.3545 687.6019)" fill="#0A41FF" font-family="Nunito" font-size="9.3874px">service@personello.com</text>
+	<text transform="matrix(0.9243 0 0 1 528.7949 687.6019)" font-family="Nunito" font-size="9.3874px"> . PID545234</text>
 	<circle class="st1" cx="174.5" cy="684.6" r="10.9"/>
 	<g>
 		<g>
