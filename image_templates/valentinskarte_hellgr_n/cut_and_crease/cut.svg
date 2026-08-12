@@ -2223,9 +2223,9 @@
 		c-0.5,0.5-1.1,0.7-1.7,0.8c-1,0.1-1.9-0.2-2.8-0.6c-2.1-1.1-4.3-2.2-6.4-3.3C42.7,359,42.1,358.7,41.5,358.4z"/>
 </g>
 <g>
-	<text transform="matrix(0.9243 0 0 1 189.4684 393.302)" font-family="'Nunito-Regular'" font-size="9.3874px">Personello GmbH · Zum Lokschuppen 1 ; D - 66424 Homburg · </text>
-	<text transform="matrix(0.9243 0 0 1 435.2286 393.302)" fill="#0A41FF" font-family="'Nunito-Regular'" font-size="9.3874px">service@personello.com</text>
-	<text transform="matrix(0.9243 0 0 1 528.6691 393.302)" font-family="'Nunito-Regular'" font-size="9.3874px"> · PID545234</text>
+	<text transform="matrix(0.9243 0 0 1 189.4684 393.302)" font-family="Nunito" font-size="9.3874px">Personello GmbH . Zum Lokschuppen 1 ; D - 66424 Homburg . </text>
+	<text transform="matrix(0.9243 0 0 1 435.2286 393.302)" fill="#0A41FF" font-family="Nunito" font-size="9.3874px">service@personello.com</text>
+	<text transform="matrix(0.9243 0 0 1 528.6691 393.302)" font-family="Nunito" font-size="9.3874px"> . PID545234</text>
 	<circle fill="#FFFFFF" cx="174.3" cy="390.5" r="10.9"/>
 	<g>
 		<g>
